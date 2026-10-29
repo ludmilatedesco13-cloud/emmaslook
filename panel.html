@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Look - Sistema de Gestión de Indumentaria</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .btn-icon { font-size: 1.2rem; text-decoration: none; margin-right: 8px; display: inline-block; transition: transform 0.2s; cursor: pointer; border: 0; background: transparent; }
+        .btn-icon:hover { transform: scale(1.2); }
+        .venta-tabla { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .venta-tabla th, .venta-tabla td { border: 1px solid var(--borde-suave); padding: 10px; text-align: left; }
+        .venta-tabla th { background-color: var(--color-secundario); color: var(--color-texto); }
+        .total-box { font-size: 1.3rem; font-weight: 600; color: var(--color-texto); text-align: right; margin-top: 10px; padding: 10px; background: #f7efe9; border-radius: 8px; }
+        .row-agregar { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; }
+        .sales-section .row-agregar-action { min-width: 0; }
+        .sales-section .payment-method-row { margin-top: 15px; }
+        .sales-section .payment-method-group { width: 100%; }
+        .sales-section .payment-method-select { display: block; width: 100%; min-width: 0; max-width: 100%; height: 48px; padding: 0 36px 0 14px; border: 1px solid var(--borde-suave); border-radius: 10px; background-color: var(--color-tarjeta); color: var(--color-texto); font-size: 0.95rem; line-height: 1.4; }
+        .sales-section #selector-variante-venta { margin: 0 0 15px; }
+        .stock-total-indicator { background: var(--color-tarjeta); border: 1px solid var(--borde-suave); border-radius: 12px; padding: 14px; }
+        .stock-total-indicator strong { display: block; color: var(--color-texto); font-size: 1.5rem; }
+        .report-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .report-filters .form-group { margin-bottom: 12px; }
+        .variant-code-help { margin: -5px 0 12px; color: var(--color-texto-suave); font-size: 0.82rem; }
+        .payment-settings-help { margin: -6px 0 18px; color: var(--color-texto-suave); }
+        .image-help { margin-top: 5px; color: var(--color-texto-suave); font-size: 0.82rem; }
+        .stats-title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+        .stats-title-row h2 { margin: 0; }
+        .stats-period-picker { position: relative; align-self: flex-start; transform: translateY(-2px); }
+        .stats-period-trigger { display: inline-flex; align-items: center; gap: 7px; padding: 5px 3px; border: 0; background: transparent; color: var(--color-texto); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+        .stats-period-trigger:hover { color: var(--color-texto); }
+        .stats-period-trigger:focus-visible, .stats-period-option:focus-visible { outline: 2px solid rgba(184, 148, 98, 0.45); outline-offset: 3px; border-radius: 4px; }
+        .stats-period-chevron { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.18s ease; }
+        .stats-period-trigger[aria-expanded="true"] .stats-period-chevron { transform: rotate(180deg); }
+        .stats-period-menu { position: absolute; z-index: 20; top: calc(100% + 7px); left: 0; min-width: 128px; padding: 5px; border: 1px solid var(--borde-suave); border-radius: 11px; background: var(--color-tarjeta); box-shadow: 0 8px 22px rgba(73, 52, 37, 0.13); }
+        .stats-period-menu[hidden] { display: none; }
+        .stats-period-option { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 8px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--color-texto); font: inherit; font-size: 0.88rem; text-align: left; cursor: pointer; }
+        .stats-period-option:hover { background: var(--color-secundario); }
+        .stats-period-option[aria-checked="true"] { color: var(--color-texto); font-weight: 600; }
+        .stats-period-option[aria-checked="true"]::after { content: "✓"; font-size: 0.8rem; }
+        @media (max-width: 700px) {
+            .stats-period-picker { transform: none; }
+            .sales-section .product-search-group { grid-column: 1 / -1; }
+            .sales-section .row-agregar-action { width: 100%; }
+            .sales-section .row-agregar-action .btn-agregar-lista { width: 100%; }
+            .sales-section .payment-method-select { font-size: 0.88rem; padding-left: 12px; }
+            .report-filters { grid-template-columns: minmax(0, 1fr); gap: 0; }
+        }
+        .resumen-grid { display: flex; justify-content: space-around; text-align: center; gap: 15px; }
+        .stats-section .resumen-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .resumen-item { flex: 1; padding: 10px; }
+        .resumen-item.mid { border-left: 1px solid var(--borde-suave); border-right: 1px solid var(--borde-suave); }
+        @media (max-width: 700px) {
+            .stats-section .resumen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .modal-img { max-width: 150px; height: auto; border-radius: 8px; margin: 0 auto 15px; background: #eee; display: block; object-fit: cover; }
+        .modal-scroll-caracteristicas { width: 100%; max-height: 140px; overflow-y: auto; background-color: #fbf7f3; padding: 12px; border-radius: 8px; border: 1px solid var(--borde-suave); text-align: left; margin-top: 8px; font-size: 0.9rem; color: var(--color-texto); white-space: pre-line; }
+        .category-control { display: flex; gap: 8px; align-items: center; }
+        .category-select { flex: 1; min-width: 0; }
+        .btn-add-dynamic { background: var(--color-primario); color: #fff; border-radius: 8px; padding: 0; font-size: 1rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; flex: 0 0 45px; transition: background 0.2s, transform 0.2s; }
+        .btn-add-dynamic svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+        .btn-add-dynamic:hover { background: var(--color-primario-hover); }
+        .btn-add-dynamic:focus-visible { outline: 3px solid rgba(184,148,98,.25); outline-offset: 2px; }
+        .btn-delete-dynamic { background: #f7e9e4; color: var(--color-peligro); border: none; border-radius: 8px; width: 45px; height: 45px; flex: 0 0 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+        .btn-delete-dynamic:hover { background: #f1d8d0; transform: translateY(-1px); }
+        .btn-delete-dynamic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .variant-row { grid-template-columns: repeat(4, minmax(0, 1fr)) 45px; gap: 12px; align-items: end; margin-bottom: 12px; }
+        .variant-row .form-group { margin-bottom: 0; }
+        .variant-row-action { padding-left: 4px; }
+        .variant-row .btn-delete-dynamic:focus-visible { outline: 3px solid rgba(169, 92, 66, 0.25); outline-offset: 2px; }
+        @media (max-width: 600px) {
+            .variant-card { padding: 12px !important; }
+            .variant-card > h3 { font-size: 0.9rem !important; line-height: 1.4; }
+            .variant-code-help { font-size: 0.78rem; }
+            .variant-row { grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 0 0 12px; padding: 12px; border: 1px solid var(--borde-suave); border-radius: 10px; background: var(--color-tarjeta); }
+            .variant-row .form-group { margin: 0; }
+            .variant-row .form-group label { margin-bottom: 4px; font-size: 0.82rem; }
+            .variant-row .form-group input { height: 42px; }
+            .variant-row-action { grid-column: 1; justify-self: end; padding: 4px 0 0; }
+        }
+    </style>
+</head>
+<body class="management-body">
+<header class="main-header">
+    <button type="button" id="btn-salir" class="btn-logout-pill" title="Cerrar Sesión">⏻ Salir</button>
+    <img src="img/emmaslook.jpg" alt="Emma's Look - Indumentaria Femenina" class="logo-marca">
+    <h1>Emma's Look - Sistema de Gestión👗</h1>
+    <p style="color: var(--color-texto-suave); margin-top: 5px; font-size: 0.9rem;">¡Hola, <strong id="nombre-usuario">Usuario</strong>!</p>
+    <nav class="header-nav">
+        <a href="#sec-venta">🛍️ Nueva Venta</a>
+        <a href="#sec-inventario">📦 Inventario</a>
+        <a href="#sec-metodos-pago">💳 Métodos de Pago</a>
+        <a href="catalogo.html" target="_blank" rel="noopener noreferrer">🌐 Catálogo Web</a>
+        <a class="admin-only" href="#sec-resumen">📈 Resumen</a>
+        <a class="admin-only" href="#sec-nuevo-producto">👗 Nuevo Producto</a>
+        <a class="admin-only" href="#" id="btnReporte">📊 Reportes de Negocio</a>
+        <a class="admin-only" href="usuarios.html">👥 Usuarios</a>
+    </nav>
+</header>
+
+<main class="container">
+    <!-- Resumen del Negocio -->
+    <section id="sec-resumen" class="card stats-section admin-only">
+    <div class="stats-title-row">
+        <h2>Resumen del Negocio 📈</h2>
+        <div class="stats-period-picker">
+            <button type="button" id="resumen-periodo-trigger" class="stats-period-trigger" aria-label="Período del resumen: Mes" aria-expanded="false" aria-controls="resumen-periodo-menu">
+                <span id="resumen-periodo-label">Mes</span>
+                <svg class="stats-period-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 6 4.5 4 4.5-4"></path></svg>
+            </button>
+            <div id="resumen-periodo-menu" class="stats-period-menu" role="group" aria-label="Elegir período" hidden>
+                <button type="button" class="stats-period-option" data-period="day" aria-checked="false">Día</button>
+                <button type="button" class="stats-period-option" data-period="week" aria-checked="false">Semana</button>
+                <button type="button" class="stats-period-option" data-period="month" aria-checked="true">Mes</button>
+                <button type="button" class="stats-period-option" data-period="year" aria-checked="false">Año</button>
+            </div>
+        </div>
+    </div>
+    <div class="resumen-grid">
+            <div class="resumen-item"><p style="font-size:0.85rem;color:var(--color-texto-suave);font-weight:600;">Total de Ventas</p><span id="total-ventas" style="font-size:1.6rem;font-weight:600;color:var(--color-exito);">0</span></div>
+            <div class="resumen-item mid"><p style="font-size:0.85rem;color:var(--color-texto-suave);font-weight:600;">Caja Recaudada</p><span id="caja-total" style="font-size:1.6rem;font-weight:600;color:var(--color-texto);">$0</span></div>
+            <div class="resumen-item"><p style="font-size:0.85rem;color:var(--color-texto-suave);font-weight:600;">Sin Stock</p><span id="productos-sin-stock" style="font-size:1.6rem;font-weight:600;color:var(--color-peligro);">0</span></div>
+            <div class="resumen-item"><p style="font-size:0.85rem;color:var(--color-texto-suave);font-weight:600;">Prendas en Stock</p><span id="stock-total-general" style="font-size:1.6rem;font-weight:600;color:var(--color-texto);">0</span></div>
+        </div>
+    </section>
+
+    <!-- Módulo de Ventas -->
+    <section id="sec-venta" class="card sales-section">
+        <h2>Registrar Nueva Venta 🛍️</h2>
+        <form id="form-ventas-multiples">
+            <div class="row-agregar">
+                <div class="form-group product-search-group" style="margin-bottom:0;">
+                    <label for="producto_buscar">Buscar Prenda (nombre, artículo o código)</label>
+                    <input type="text" id="producto_buscar" list="lista_productos" placeholder="Ej: Remera Básica · Artículo RB01" autocomplete="off">
+                </div>
+                <div class="form-group quantity-group" style="margin-bottom:0;">
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" id="cantidad" min="1" value="1">
+                </div>
+                <div class="row-agregar-action">
+                    <button type="button" id="btn-agregar-item" class="btn-agregar-lista">Añadir</button>
+                </div>
+            </div>
+            <datalist id="lista_productos"></datalist>
+            <div class="form-group" id="selector-variante-venta" hidden>
+                <label for="variante-venta">Elegí talle y color</label>
+                <select id="variante-venta">
+                    <option value="">Primero seleccioná una prenda</option>
+                </select>
+            </div>
+            <div class="table-responsive">
+                <table class="venta-tabla" id="tabla-carrito">
+                    <thead>
+                        <tr>
+                            <th>Prenda</th>
+                            <th>Talle</th>
+                            <th>Color</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th>Quitar</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Selector de Método de Pago Integrado -->
+            <div class="form-group-row payment-method-row">
+                <div class="form-group payment-method-group">
+                    <label for="metodo_pago">Método de Pago</label>
+                    <select id="metodo_pago" class="payment-method-select" required>
+                        <option value="">Seleccioná método de pago</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Detalle visual del cálculo de recargo o descuento -->
+            <div id="detalle-calculo-pago" style="font-size: 0.95rem; color: var(--color-texto-suave); text-align: right; margin-bottom: 5px;"></div>
+
+            <div class="total-box">Total Final: $<span id="monto-total-venta">0</span></div>
+            <button type="submit" class="btn-submit" style="margin-top:15px;">Finalizar y Registrar Venta</button>
+        </form>
+    </section>
+
+    <section id="sec-metodos-pago" class="card">
+        <h2>Configurar Métodos de Pago 💳</h2>
+        <p class="payment-settings-help">Definí el descuento o recargo que se aplica automáticamente al elegir cada método en una venta.</p>
+        <form id="form-config-metodo-pago">
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="metodo_pago_config">Método de Pago</label>
+                    <select id="metodo_pago_config" required>
+                        <option value="">Cargando métodos...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tipo_ajuste_config">Ajuste</label>
+                    <select id="tipo_ajuste_config">
+                        <option value="">Sin descuento ni recargo</option>
+                        <option value="descuento">Descuento</option>
+                        <option value="recargo">Recargo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="valor_ajuste_config">Porcentaje (%)</label>
+                    <input id="valor_ajuste_config" type="number" min="0" step="0.01" inputmode="decimal" value="0" disabled>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Guardar configuración</button>
+        </form>
+    </section>
+
+    <!-- Registrar Nuevo Producto -->
+    <section id="sec-nuevo-producto" class="card form-section admin-only">
+        <h2>Registrar Nueva Prenda 👚</h2>
+        <form id="form-nuevo-producto">
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre de la Prenda</label>
+                    <input type="text" id="nombre" placeholder="Ej: Remera Básica Escote V" required>
+                </div>
+                <div class="form-group">
+                    <label for="marca">Marca / Proveedor (Opcional)</label>
+                    <input type="text" id="marca" placeholder="Ej: Marca Local, Importado">
+                </div>
+            </div>
+
+            <!-- SECCIÓN NUEVA: Múltiples variantes de Talle, Color y Stock -->
+            <div class="card variant-card" style="background: #fbf7f3; border: 1px dashed var(--color-primario); margin-bottom: 18px; padding: 15px;">
+                <h3 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--color-texto);">Gestión de Stock por Talle y Color 👗</h3>
+                <p class="variant-code-help">Podés repetir el artículo/código entre talles y colores de esta prenda.</p>
+                <div id="contenedor-variantes">
+                    <div class="form-group-row variante-row variant-row">
+                        <div class="form-group">
+                            <label>Artículo / Código</label>
+                            <input type="text" class="var-articulo" placeholder="Ej: RB01 " required>
+                        </div>
+                        <div class="form-group">
+                            <label>Talle</label>
+                            <input type="text" class="var-talle" placeholder="Ej: S, M, 38" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" class="var-color" placeholder="Ej: Negro" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number" class="var-stock" min="0" value="1" required>
+                        </div>
+                        <div class="variant-row-action">
+                            <button type="button" id="btn-agregar-variante" class="btn-add-dynamic" title="Agregar otra variante">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <div class="category-control">
+                        <select id="categoria" class="category-select" required>
+                            <option value="">-- Seleccionar Categoría --</option>
+                        </select>
+                        <button type="button" id="btn-nueva-categoria" class="btn-add-dynamic" title="Agregar Categoría" aria-label="Agregar Categoría">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                        </button>
+                        <button type="button" id="btn-eliminar-categoria" class="btn-delete-dynamic" title="Eliminar Categoría" aria-label="Eliminar Categoría">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="subcategoria">Subcategoría</label>
+                    <div class="category-control">
+                        <select id="subcategoria" class="category-select" required>
+                            <option value="">-- Primero elegí una categoría --</option>
+                        </select>
+                        <button type="button" id="btn-nueva-subcategoria" class="btn-add-dynamic" title="Agregar Subcategoría" aria-label="Agregar Subcategoría">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                        </button>
+                        <button type="button" id="btn-eliminar-subcategoria" class="btn-delete-dynamic" title="Eliminar Subcategoría" aria-label="Eliminar Subcategoría">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group-row">
+                <div class="form-group"><label for="precio_costo">Precio Costo ($)</label><input type="text" inputmode="decimal" id="precio_costo" placeholder="Ej: 5000" required></div>
+                <div class="form-group"><label for="precio_venta">Precio Venta ($)</label><input type="text" inputmode="decimal" id="precio_venta" placeholder="Ej: 12000" required></div>
+            </div>
+            <div class="form-group">
+                <label for="caracteristicas">Descripción / Detalle (Composición, tipo de tela, calce)</label>
+                <textarea id="caracteristicas" rows="3" placeholder="Ej: Algodón 100%, calce holgado"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="foto">Fotos de la Prenda (hasta 8)</label>
+                <input type="file" id="foto" accept="image/jpeg,image/png,image/webp" multiple style="border:none;padding:5px 0;">
+                <p class="image-help">Subí una o varias fotos y asigná a cada una su color para mostrarlas correctamente en el catálogo. Máximo 5 MB por imagen.</p>
+                <div id="contenedor-fotos-producto" class="product-photos-grid" hidden></div>
+            </div>
+            <button type="submit" class="btn-submit">Guardar Prenda</button>
+        </form>
+    </section>
+
+    <!-- Módulo de Inventario -->
+    <section id="sec-inventario" class="card table-section">
+        <h2>Inventario Actual 📦</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Artículo</th>
+                        <th>Marca</th>
+                        <th>Talle</th>
+                        <th>Color</th>
+                        <th>Clasificación</th>
+                        <th>Precio Venta</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-inventario"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Modal Detalles -->
+<div id="modal-detalles" class="modal">
+    <div class="modal-content detail-modal-content">
+        <span class="close-modal" id="btn-close-modal">&times;</span>
+        <h2 id="modal-titulo-prod" style="font-size:1.2rem;margin-bottom:15px;"></h2>
+        <div class="detail-photo-viewer">
+            <img id="modal-img-prod" src="" alt="Foto del producto" class="modal-img">
+            <button type="button" id="modal-foto-anterior-prod" class="detail-photo-arrow detail-photo-previous" aria-label="Foto anterior" hidden>&lsaquo;</button>
+            <span id="modal-contador-fotos-prod" class="detail-photo-count" aria-live="polite" hidden></span>
+            <button type="button" id="modal-foto-siguiente-prod" class="detail-photo-arrow detail-photo-next" aria-label="Foto siguiente" hidden>&rsaquo;</button>
+        </div>
+        <p><strong>Marca / Proveedor:</strong> <span id="modal-marca-prod"></span></p>
+        <p><strong>Talle:</strong> <span id="modal-talle-prod"></span></p>
+        <p><strong>Color:</strong> <span id="modal-color-prod"></span></p>
+        <p><strong>Precio Venta:</strong> $<span id="modal-precio-prod"></span></p>
+        <p><strong>Stock:</strong> <span id="modal-stock-prod"></span> u.</p>
+        <hr style="border:0;border-top:1px solid var(--borde-suave);margin:12px 0;">
+        <p><strong>Descripción / Detalles:</strong></p>
+        <div id="modal-info-prod" class="modal-scroll-caracteristicas"></div>
+    </div>
+</div>
+
+<!-- Modal Reporte Mensual -->
+<div id="modalReporte" class="modal">
+    <div class="modal-content" style="max-width:550px;text-align:left;">
+        <span class="close-modal" id="cerrarModalReporte">&times;</span>
+        <h2 style="font-size:1.2rem;margin-bottom:15px;text-align:center;">📊 Estadísticas y Reportes</h2>
+        <div class="report-filters">
+            <div class="form-group">
+                <label for="reporte-periodo">Período</label>
+                <select id="reporte-periodo">
+                    <option value="day">Día</option>
+                    <option value="week">Semana</option>
+                    <option value="month" selected>Mes</option>
+                    <option value="year">Año</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reporte-fecha">Fecha de referencia</label>
+                <input type="date" id="reporte-fecha">
+            </div>
+        </div>
+        <div style="margin-bottom:15px;text-align:right;">
+            <button id="btn-exportar" type="button" style="background:var(--color-primario);color:#fff;border:0;padding:8px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">📊 Descargar Reporte</button>
+        </div>
+        <div id="resultadoEstadisticas"><p style="text-align:center;">Cargando estadísticas...</p></div>
+    </div>
+</div>
+
+<!-- Script rápido para habilitar la clonación de filas de variantes en el formulario -->
+<script>
+    document.addEventListener('click', function(e) {
+        const botonAgregar = e.target.closest('#btn-agregar-variante');
+        const botonEliminar = e.target.closest('.btn-eliminar-variante');
+
+        if (botonAgregar) {
+            const contenedor = document.getElementById('contenedor-variantes');
+            const nuevaFila = document.createElement('div');
+            nuevaFila.className = 'form-group-row variante-row variant-row';
+            nuevaFila.innerHTML = `
+                <div class="form-group">
+                    <label>Artículo / Código</label>
+                    <input type="text" class="var-articulo" placeholder="Ej: RB01 (se puede repetir)" required>
+                </div>
+                <div class="form-group">
+                    <label>Talle</label>
+                    <input type="text" class="var-talle" placeholder="Ej: S, M, 38" required>
+                </div>
+                <div class="form-group">
+                    <label>Color</label>
+                    <input type="text" class="var-color" placeholder="Ej: Negro" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" class="var-stock" min="0" value="1" required>
+                </div>
+                <div class="variant-row-action">
+                    <button type="button" class="btn-delete-dynamic btn-eliminar-variante" title="Quitar variante" aria-label="Quitar variante">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+                    </button>
+                </div>
+            `;
+            contenedor.appendChild(nuevaFila);
+        } else if (botonEliminar) {
+            botonEliminar.closest('.variante-row').remove();
+        }
+    });
+</script>
+
+<!-- Scripts como módulos para Neon -->
+<script type="module" src="js/neon-config.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
