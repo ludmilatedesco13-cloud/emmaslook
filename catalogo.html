@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f2ed">
+    <meta name="description" content="Descubrí las últimas tendencias de Emma's Look. Elegí tu outfit y consultá disponibilidad por WhatsApp.">
+    <title>Catálogo Oficial | Emma's Look</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/catalogo.css">
+</head>
+<body class="catalogo-body">
+    <header class="catalogo-header">
+        <nav class="catalogo-nav" aria-label="Navegación principal">
+            
+        </nav>
+
+        <div class="header-utility" aria-label="Información del local">
+            <span class="utility-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7zM7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM18 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"></path></svg>
+                <span>Envíos a domicilio</span>
+            </span>
+            <span class="utility-divider" aria-hidden="true"></span>
+            <span class="utility-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+                <span>19 de Marzo 333 bis <small>Frente al Teatro Coliseo</small></span>
+            </span>
+        </div>
+
+        <a class="brand-lockup" href="#inicio" aria-label="Emma's Look, inicio">
+            <span class="brand-seal">
+                <img src="img/emmaslook.jpg" alt="Logo de Emma's Look">
+            </span>
+            <span class="brand-caption">
+                <span>Indumentaria femenina y accesorios</span>
+            </span>
+        </a>
+
+        <span class="brand-caption-divider" aria-hidden="true"><i></i><b>♡</b><i></i></span>
+        <p class="brand-hours">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            De lunes a sábados · 10:00 a 13:00 y 17:00 a 21:00 hs
+        </p>
+        <p class="brand-slogan">Somos tu outfit del día <span aria-hidden="true">♡</span></p>
+    </header>
+
+    <main class="catalogo-container" id="inicio">
+        <section class="filtros-card" aria-label="Buscar y filtrar prendas">
+            <label class="search-control" for="busqueda-prenda">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+                <input type="search" id="busqueda-prenda" placeholder="Buscá por nombre de prenda..." autocomplete="off">
+            </label>
+
+            <div class="filtros-row">
+                <div class="filter-control">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 10v-2"></path><path d="M12 8a2.5 2.5 0 1 0-2.5-2.5"></path><path d="m12 10 8.1 5a1.8 1.8 0 0 1-.95 3.3H4.85a1.8 1.8 0 0 1-.95-3.3L12 10Z"></path></svg>
+                    <span class="filter-dropdown" data-filter="categoria">
+                        <button type="button" class="filter-trigger" aria-label="Filtrar por categoría" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="filter-trigger-label">Todas las Categorías</span>
+                            <svg class="filter-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 6 4.5 4 4.5-4"></path></svg>
+                        </button>
+                        <span class="filter-menu" role="listbox" aria-label="Categorías" hidden></span>
+                        <select id="filtro-categoria" class="filter-native-select" tabindex="-1" aria-hidden="true">
+                            <option value="">Todas las Categorías</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="filter-control">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="11" rx="2"></rect><path d="M7.5 6.5v4m4-4v2.5m4-2.5v4m4-4v2.5"></path></svg>
+                    <span class="filter-dropdown" data-filter="talle">
+                        <button type="button" class="filter-trigger" aria-label="Filtrar por talle" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="filter-trigger-label">Todos los Talles</span>
+                            <svg class="filter-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 6 4.5 4 4.5-4"></path></svg>
+                        </button>
+                        <span class="filter-menu" role="listbox" aria-label="Talles" hidden></span>
+                        <select id="filtro-talle" class="filter-native-select" tabindex="-1" aria-hidden="true">
+                            <option value="">Todos los Talles</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="filter-control">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.5 1.5 0 0 1 1.1-2.6H18a3 3 0 0 0 3-3c0-5-4-9-9-9Z"></path><circle cx="7.5" cy="11" r="1"></circle><circle cx="10" cy="7.5" r="1"></circle><circle cx="15" cy="8" r="1"></circle></svg>
+                    <span class="filter-dropdown" data-filter="color">
+                        <button type="button" class="filter-trigger" aria-label="Filtrar por color" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="filter-trigger-label">Todos los Colores</span>
+                            <svg class="filter-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 6 4.5 4 4.5-4"></path></svg>
+                        </button>
+                        <span class="filter-menu" role="listbox" aria-label="Colores" hidden></span>
+                        <select id="filtro-color" class="filter-native-select" tabindex="-1" aria-hidden="true">
+                            <option value="">Todos los Colores</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="catalogo-section" id="catalogo" aria-labelledby="catalogo-titulo">
+            <div class="section-heading">
+                <span class="heading-rule" aria-hidden="true"></span>
+                <div>
+                    <h1 id="catalogo-titulo">Nuestro Catálogo</h1>
+                    <p>Descubrí las últimas tendencias</p>
+                </div>
+                <span class="heading-rule" aria-hidden="true"></span>
+                <span class="heading-heart" aria-hidden="true">♥</span>
+            </div>
+            <div id="grilla-productos" class="products-grid" aria-live="polite">
+                <p class="loading-text">Cargando catálogo...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="catalogo-footer">
+        <span>Emma's Look</span>
+        <span>Indumentaria femenina y accesorios · Zárate</span>
+    </footer>
+
+    <div id="modal-pedido" class="modal catalogo-modal">
+        <div class="modal-content catalogo-modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-nombre">
+            <button type="button" class="close-modal" id="cerrar-modal" aria-label="Cerrar">&times;</button>
+            <div class="catalogo-modal-layout">
+                <div class="catalogo-modal-gallery-column">
+                    <div class="catalogo-modal-image-stage">
+                        <img id="modal-img" src="" alt="Prenda" class="modal-img">
+                        <button type="button" id="modal-foto-anterior" class="catalogo-modal-photo-arrow is-previous" aria-label="Foto anterior" hidden>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+                        </button>
+                        <span id="modal-contador-fotos" class="catalogo-modal-photo-count" aria-live="polite" hidden></span>
+                        <button type="button" id="modal-foto-siguiente" class="catalogo-modal-photo-arrow is-next" aria-label="Foto siguiente" hidden>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+                        </button>
+                    </div>
+                    <div id="modal-galeria-fotos" class="modal-photo-gallery" hidden></div>
+                </div>
+                <div class="catalogo-modal-details">
+                    <p class="modal-eyebrow">Emma's Look · Catálogo</p>
+                    <h2 id="modal-nombre"></h2>
+                    <p id="modal-precio" class="modal-precio-text"></p>
+                    <p class="modal-code-text">Artículo <span id="modal-articulo"></span></p>
+                    <p id="modal-descripcion" class="modal-desc-text"></p>
+
+                    <div class="form-group modal-variant-group">
+                        <label for="select-variante">Elegí talle y color</label>
+                        <select id="select-variante" class="swal2-select"></select>
+                        <p id="modal-stock-variante" class="modal-stock-text"></p>
+                    </div>
+
+                    <button type="button" id="btn-enviar-whatsapp" class="btn-whatsapp">
+                        💬 Encargar por WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/neon-config.js"></script>
+    <script type="module" src="js/catalogo.js"></script>
+</body>
+</html>
