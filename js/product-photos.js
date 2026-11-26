@@ -17,9 +17,15 @@ export function comprimirImagen(file) {
                 if (!context) throw new Error('No se pudo preparar el compresor de imágenes.');
 
                 context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                const imagenComprimida = canvas.toDataURL('image/webp', 0.75);
+                let imagenComprimida = canvas.toDataURL('image/webp', 0.75);
                 if (!imagenComprimida.startsWith('data:image/webp;base64,')) {
-                    throw new Error('El navegador no pudo convertir la imagen a WebP.');
+                    const formatoAlternativo = file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+                    imagenComprimida = formatoAlternativo === 'image/jpeg'
+                        ? canvas.toDataURL(formatoAlternativo, 0.75)
+                        : canvas.toDataURL(formatoAlternativo);
+                }
+                if (!/^data:image\/(?:webp|jpeg|png);base64,/.test(imagenComprimida)) {
+                    throw new Error('El navegador no pudo exportar la imagen a un formato compatible.');
                 }
                 resolve(imagenComprimida);
             } catch (error) {
